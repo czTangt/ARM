@@ -1,9 +1,5 @@
-# ARM
-## Assembly
-学习 arm 的编译过程
+# Compile
+里面罗列了 wsl 中交叉编译 ARM aarch64 的三种不同方法，可以根据情况进行选择。
 
-## CPP
-学习 cpp 类的编译过程
-
-## ELF
-学习解析 ELF 文件
+# ELF
+放置对于 elf 文件的学习文件。

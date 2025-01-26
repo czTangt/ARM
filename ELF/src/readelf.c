@@ -92,10 +92,13 @@ void parse_elf_header(const Elf64_Ehdr* elf_header) {
     printf("  Type:                              %s\n", get_type_name(elf_header->e_type));
     printf("  Machine:                           %s\n", get_machine_name(elf_header->e_machine));
     printf("  Version:                           %d\n", elf_header->e_version);
-    printf("  Entry point address:               %#lx\n", elf_header->e_entry);
-    printf("  Start of program headers:          %ld (bytes into file)\n", elf_header->e_phoff);
-    printf("  Start of section headers:          %ld (bytes into file)\n", elf_header->e_shoff);
-    printf("  Flags:                             %#lx\n", elf_header->e_flags);
+    printf("  Entry point address:               %#llx\n",
+           (unsigned long long)elf_header->e_entry);
+    printf("  Start of program headers:          %llu (bytes into file)\n",
+           (unsigned long long)elf_header->e_phoff);
+    printf("  Start of section headers:          %llu (bytes into file)\n",
+           (unsigned long long)elf_header->e_shoff);
+    printf("  Flags:                             %#x\n", elf_header->e_flags);
     printf("  Size of this header:               %d (bytes)\n", elf_header->e_ehsize);
     printf("  Size of program headers:           %d (bytes)\n", elf_header->e_phentsize);
     printf("  Number of program headers:         %d\n", elf_header->e_phnum);
@@ -117,21 +120,19 @@ void parse_section_headers(const Elf64_Ehdr* elf_header) {
     // 遍历节头
     for (int i = 0; i < elf_header->e_shnum; i++) {
         // 打印节号、名称、类型、地址、偏移
-        printf("  [%2d] %-17s %-16s %016lx  %08lx\n",
-            i,
-            &strtab[sections[i].sh_name],
-            get_section_type_name(sections[i].sh_type),
-            sections[i].sh_addr,
-            sections[i].sh_offset);
+        printf("  [%2d] %-17s %-16s %016llx  %08llx\n", i,
+               &strtab[sections[i].sh_name],
+               get_section_type_name(sections[i].sh_type),
+               (unsigned long long)sections[i].sh_addr,
+               (unsigned long long)sections[i].sh_offset);
 
         // 打印节大小、条目大小、标志、链接索引、信息、对齐
-        printf("       %016lx  %016lx  %-6s %4u %4u %5lu\n",
-            sections[i].sh_size,
-            sections[i].sh_entsize,
-            get_section_flags_name(sections[i].sh_flags),
-            sections[i].sh_link,
-            sections[i].sh_info,
-            sections[i].sh_addralign);
+        printf("       %016llx  %016llx  %-6s %4u %4u %5llu\n",
+               (unsigned long long)sections[i].sh_size,
+               (unsigned long long)sections[i].sh_entsize,
+               get_section_flags_name(sections[i].sh_flags),
+               sections[i].sh_link, sections[i].sh_info,
+               (unsigned long long)sections[i].sh_addralign);
     }
 }
 
@@ -298,17 +299,15 @@ void print_symbol_table(const char* strtab, Elf64_Sym* symbols, int count, const
 
     for (int i = 0; i < count; i++) {
         // 符号表内容输出，按照readelf -s格式进行对齐
-        printf("%6d: %016lx  %-5lu %-7s %-6s %-8s %-4d %s\n",
-            i,
-            symbols[i].st_value,
-            symbols[i].st_size,
-            // 解析符号类型
-            get_elf64_st_type_name(symbols[i].st_info),
-            // 解析符号绑定
-            get_elf64_st_bind_name(symbols[i].st_info),
-            // 解析符号可见性
-            get_elf64_st_visibility_name(symbols[i].st_other),
-            symbols[i].st_shndx,
-            &strtab[symbols[i].st_name]);
+        printf("%6d: %016llx  %-5llu %-7s %-6s %-8s %-4d %s\n", i,
+               (unsigned long long)symbols[i].st_value,
+               (unsigned long long)symbols[i].st_size,
+               // 解析符号类型
+               get_elf64_st_type_name(symbols[i].st_info),
+               // 解析符号绑定
+               get_elf64_st_bind_name(symbols[i].st_info),
+               // 解析符号可见性
+               get_elf64_st_visibility_name(symbols[i].st_other),
+               symbols[i].st_shndx, &strtab[symbols[i].st_name]);
     }
 }
